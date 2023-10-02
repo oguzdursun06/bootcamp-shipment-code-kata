@@ -1,5 +1,7 @@
 import com.trendyol.shipment.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,21 +15,16 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class BasketTest {
+class FrequencyBasedShipmentSizeCalculatorTest {
 
-    private Basket basket;
 
     private ShipmentSizeCalculator shipmentSizeCalculator;
 
     @BeforeEach
     void setUp() {
-        shipmentSizeCalculator = mock(FrequencyBasedShipmentSizeCalculator.class);
-        basket = new Basket(shipmentSizeCalculator);
+        shipmentSizeCalculator = new FrequencyBasedShipmentSizeCalculator();
     }
 
     @ParameterizedTest
@@ -35,11 +32,14 @@ class BasketTest {
     void shouldGetOrderShipmentSizeAsExpected(List<ShipmentSize> shipmentSizesOfProducts, ShipmentSize orderShipmentSize) {
         final var products = shipmentSizesOfProducts.stream().map(Product::create).collect(Collectors.toList());
 
-        basket.setProducts(products);
+        assertThat(shipmentSizeCalculator.calculateSize(products), equalTo(orderShipmentSize));
+    }
 
-        when(shipmentSizeCalculator.calculateSize(anyList())).thenReturn(orderShipmentSize);
+    @Test
+    void shouldThrowEmptyListExceptionWhenProductListIsEmpty(){
+        List<Product> products = List.of();
 
-        assertThat(basket.getShipmentSize(), equalTo(orderShipmentSize));
+        Assertions.assertThrows(EmptyListException.class, () -> shipmentSizeCalculator.calculateSize(products));
     }
 
     private static Stream<Arguments> shipmentSizeOfProductsAndBasketShipmentSize() {
