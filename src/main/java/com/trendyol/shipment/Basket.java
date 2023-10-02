@@ -1,13 +1,16 @@
 package com.trendyol.shipment;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Basket {
 
     private List<Product> products;
 
-    private final ShipmentSizeCalculator shipmentSizeCalculator = new FrequencyBasedShipmentSizeCalculator();
+    private final ShipmentSizeCalculator shipmentSizeCalculator;
+
+    public Basket(ShipmentSizeCalculator shipmentSizeCalculator) {
+        this.shipmentSizeCalculator = shipmentSizeCalculator;
+    }
 
     public ShipmentSize getShipmentSize() {
         return shipmentSizeCalculator.calculateSize(products);
