@@ -1,5 +1,7 @@
 package com.trendyol.shipment;
 
+import com.trendyol.shipment.exceptions.ShipmentBaseException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -9,19 +11,23 @@ public class FrequencyBasedShipmentSizeCalculator implements ShipmentSizeCalcula
 
     @Override
     public ShipmentSize calculateSize(List<Product> products) {
+        if(products == null){
+            throw new ShipmentBaseException("Product list is null, shipment size can not be calculated");
+        }
+
         if(products.isEmpty()){
-            throw new EmptyListException("Product list is empty, shipment size can not be calculated");
+            throw new ShipmentBaseException("Product list is empty, shipment size can not be calculated");
         }
 
         Map<ShipmentSize, Long> shipmentSizeFrequencyMap = getShipmentSizeFrequencyMap(products);
-        Optional<ShipmentSize> largestShipmentSizeGreaterThanThreshold = getLargestShipmentSizeGreaterThanThresholdIfExists(shipmentSizeFrequencyMap);
+        Optional<ShipmentSize> largestShipmentSizeGreaterThanThreshold = getLargestShipmentSizeGreaterThanThreshold(shipmentSizeFrequencyMap);
 
         return largestShipmentSizeGreaterThanThreshold.isPresent() ?
                 ShipmentSize.getUpperShipmentSize(largestShipmentSizeGreaterThanThreshold.get()) :
                 getLargestShipmentSize(products);
     }
 
-    private Optional<ShipmentSize> getLargestShipmentSizeGreaterThanThresholdIfExists(Map<ShipmentSize, Long> shipmentSizeFrequencyMap) {
+    private Optional<ShipmentSize> getLargestShipmentSizeGreaterThanThreshold(Map<ShipmentSize, Long> shipmentSizeFrequencyMap) {
         return shipmentSizeFrequencyMap.entrySet()
                 .stream()
                 .filter(shipmentSizeFrequency -> shipmentSizeFrequency.getValue() >= PRODUCT_SHIPMENT_THRESHOLD)

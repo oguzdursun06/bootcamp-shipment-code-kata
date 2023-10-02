@@ -1,4 +1,5 @@
 import com.trendyol.shipment.*;
+import com.trendyol.shipment.exceptions.ShipmentBaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,10 +37,15 @@ class FrequencyBasedShipmentSizeCalculatorTest {
     }
 
     @Test
-    void shouldThrowEmptyListExceptionWhenProductListIsEmpty(){
+    void shouldThrowExceptionWhenProductListIsEmpty(){
         List<Product> products = List.of();
 
-        Assertions.assertThrows(EmptyListException.class, () -> shipmentSizeCalculator.calculateSize(products));
+        Assertions.assertThrows(ShipmentBaseException.class, () -> shipmentSizeCalculator.calculateSize(products));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenProductListIsNull(){
+        Assertions.assertThrows(ShipmentBaseException.class, () -> shipmentSizeCalculator.calculateSize(null));
     }
 
     private static Stream<Arguments> shipmentSizeOfProductsAndBasketShipmentSize() {
