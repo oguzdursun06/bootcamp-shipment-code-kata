@@ -5,10 +5,14 @@ import java.util.stream.Collectors;
 
 public class FrequencyBasedShipmentSizeCalculator implements ShipmentSizeCalculator{
 
-    public static final int PRODUCT_SHIPMENT_THRESHOLD = 3;
+    private static final int PRODUCT_SHIPMENT_THRESHOLD = 3;
 
     @Override
     public ShipmentSize calculateSize(List<Product> products) {
+        if(products.isEmpty()){
+            throw new EmptyListException("Product list is empty, shipment size can not be calculated");
+        }
+
         Map<ShipmentSize, Long> shipmentSizeFrequencyMap = getShipmentSizeFrequencyMap(products);
         Optional<ShipmentSize> largestShipmentSizeGreaterThanThreshold = getLargestShipmentSizeGreaterThanThresholdIfExists(shipmentSizeFrequencyMap);
 
